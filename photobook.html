@@ -655,11 +655,10 @@
 
         <!-- PAGE 10 — IMAGE 3/5 STYLE: 2/3 photo + 1/3 text column -->
         <div class="page">
-          <div style="width:100%;height:100%;display:grid;grid-template-columns:2fr 1fr;background:#ffffff;">
-            <div class="ed-media" style="margin:clamp(16px,3%,40px);">
-              <div class="slot-label">Video</div>
-              <video src="Video1.mp4" playsinline loop style="width:100%;height:100%;object-fit:cover;display:block;"></video>
-            </div>
+          <div style="position:relative;width:100%;height:100%;">
+            <video id="page10-video" src="Video1.mp4" muted playsinline loop style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+              <button onclick="toggleMute(this)" style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,0.5);color:white;border:none;padding:6px 12px;cursor:pointer;font-size:13px;letter-spacing:0.05em;font-family:inherit;">🔇 UNMUTE</button>
+          </div>
             <div style="display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(16px,3%,40px) clamp(16px,3%,40px) clamp(16px,3%,40px) 0;background:#ffffff;">
               <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(9px,0.85vw,11px);line-height:1.65;color:var(--ink);opacity:0.7;">
                 <strong>03</strong><br/>
