@@ -855,6 +855,13 @@
       const max = viewport.scrollWidth - viewport.clientWidth;
       progress.style.width = (max > 0 ? viewport.scrollLeft / max * 100 : 0) + '%';
     });
+    
+    /* ── Mute switch ── */
+  function toggleMute(btn) {
+  const video = document.getElementById('page10-video');
+  video.muted = !video.muted;
+  btn.textContent = video.muted ? '🔇 UNMUTE' : '🔊 MUTE';
+  }
   })();
   </script>
 </body>
