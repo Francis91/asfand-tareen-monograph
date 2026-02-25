@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tareen Monograph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET & BASE ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:   #141210;
+      --dust:  #8a7e6e;
+      --cream: #f5f2ed;
+      --white: #ffffff;
+      --nav-h: 64px;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--ink);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ───────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(24px, 5vw, 72px);
+      z-index: 100;
+      transition: background 0.4s, backdrop-filter 0.4s;
+    }
+
+    nav.scrolled {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .nav-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: clamp(15px, 1.4vw, 18px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      transition: color 0.4s;
+    }
+
+    nav.scrolled .nav-name { color: var(--ink); }
+
+    .nav-links {
+      display: flex;
+      gap: clamp(28px, 3vw, 48px);
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      transition: color 0.25s, opacity 0.25s;
+    }
+
+    .nav-links a:hover { color: var(--ink); opacity: 0.5; }
+
+    nav.scrolled .nav-links a { color: var(--dust); }
+    nav.scrolled .nav-links a:hover { color: var(--ink); }
+
+    /* ─── HERO ──────────────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .hero-img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.18) 0%,
+        rgba(0,0,0,0.04) 40%,
+        rgba(0,0,0,0.30) 100%
+      );
+    }
+
+    .scroll-cue {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,0.7);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 300;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: opacity 0.3s;
+      animation: cue-fade 2.8s ease-in-out infinite;
+    }
+
+    .scroll-cue:hover { opacity: 0.9; }
+
+    .scroll-cue svg {
+      width: 20px;
+      height: 20px;
+      animation: cue-bob 2.8s ease-in-out infinite;
+    }
+
+    @keyframes cue-bob {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(6px); }
+    }
+
+    @keyframes cue-fade {
+      0%, 100% { opacity: 0.55; }
+      50%       { opacity: 0.9; }
+    }
+
+    /* ─── BOOKS SECTION ─────────────────────────────────────────── */
+    #portfolio {
+      background: var(--white);
+    }
+
+    .book-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    /* Alternate layout for even rows */
+    .book-row:nth-child(even) { direction: rtl; }
+    .book-row:nth-child(even) > * { direction: ltr; }
+
+    /* Cover panel — padded container */
+    .book-cover-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(32px, 5vw, 72px);
+      background: var(--cream);
+      cursor: pointer;
+    }
+
+    /* The actual book cover inside the panel */
+    .book-cover-inner {
+      position: relative;
+      /* 16:10 aspect ratio matching the open photobook */
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      max-height: 68vh;
+      overflow: hidden;
+      border-radius: 1px 2px 2px 1px;
+      box-shadow:
+        2px 0 0 0 rgba(0,0,0,0.12),
+        4px 4px 18px rgba(0,0,0,0.18),
+        8px 12px 40px rgba(0,0,0,0.14);
+    }
+
+    .book-cover-inner img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94),
+                  opacity 0.4s;
+      opacity: 0.92;
+    }
+
+    .book-cover-panel:hover .book-cover-inner img {
+      transform: scale(1.04);
+      opacity: 1;
+    }
+
+    .book-cover-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: clamp(16px, 2.5vw, 32px);
+      background: linear-gradient(to top, rgba(0,0,0,0.50) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.35s;
+      pointer-events: none;
+    }
+
+    .book-cover-panel:hover .book-cover-label { opacity: 1; }
+
+    .book-cover-label span {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+    }
+
+    /* Text panel */
+    .book-text-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(48px, 8vw, 120px) clamp(40px, 6vw, 96px);
+      background: var(--white);
+    }
+
+    .book-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--dust);
+      margin-bottom: 20px;
+    }
+
+    .book-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(32px, 4vw, 62px);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 24px;
+    }
+
+    .book-title em {
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .book-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(15px, 1.3vw, 18px);
+      font-weight: 300;
+      line-height: 1.75;
+      color: #5a5248;
+      max-width: 42ch;
+      margin-bottom: 40px;
+    }
+
+    .book-meta {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dust);
+      margin-bottom: 40px;
+      line-height: 1.9;
+    }
+
+    .cta-read {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      transition: gap 0.3s;
+    }
+
+    .cta-read::after {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 1px;
+      background: var(--ink);
+      transition: width 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+
+    .cta-read:hover { gap: 20px; }
+    .cta-read:hover::after { width: 52px; }
+
+    /* ─── MOBILE ─────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      /* Stack book rows: image on top, text below */
+      .book-row {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      /* Restore natural LTR order for even rows on mobile */
+      .book-row:nth-child(even) { direction: ltr; }
+
+      /* Cover panel: shorter, landscape-ish aspect on mobile */
+      .book-cover-panel {
+        padding: clamp(24px, 5vw, 48px);
+        min-height: 52vw;
+      }
+
+      .book-cover-inner {
+        max-height: none;
+      }
+
+      /* Text panel: tighter padding */
+      .book-text-panel {
+        padding: clamp(36px, 8vw, 64px) clamp(28px, 7vw, 64px);
+      }
+
+      .book-desc {
+        max-width: 100%;
+      }
+
+      /* Nav: tighten up */
+      nav {
+        padding: 20px clamp(20px, 5vw, 40px);
+      }
+      .nav-links {
+        gap: 24px;
+      }
+      .nav-links a {
+        font-size: 8px;
+      }
+    }
+
+    /* ─── CONTACT SECTION ───────────────────────────────────────── */
+    #contact {
+      background: var(--white);
+      padding: clamp(72px, 12vh, 140px) clamp(40px, 8vw, 120px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 32px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .contact-eyebrow {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--dust);
+    }
+
+    .contact-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(34px, 5vw, 72px);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    .contact-heading em { font-style: italic; }
+
+    .contact-body {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(15px, 1.4vw, 19px);
+      font-weight: 300;
+      line-height: 1.8;
+      color: #5a5248;
+      max-width: 50ch;
+    }
+
+    .contact-email {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0,0,0,0.2);
+      padding-bottom: 3px;
+      transition: border-color 0.3s, color 0.3s;
+      margin-top: 8px;
+    }
+
+    .contact-email:hover {
+      color: var(--dust);
+      border-color: var(--dust);
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────────── */
+    footer {
+      background: var(--ink);
+      border-top: none;
+      padding: 28px clamp(24px, 5vw, 72px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .footer-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .footer-copy {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 9px;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* ─── BOOK OVERLAY ──────────────────────────────────────────── */
+    #book-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.45s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    #book-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #book-overlay iframe {
+      width: min(90vw, 1280px);
+      height: min(56.25vw, 88vh);
+      border: none;
+      border-radius: 2px 3px 3px 2px;
+      display: block;
+      transform: scale(0.97);
+      transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    #book-overlay.open iframe { transform: scale(1); }
+
+    .overlay-close {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: rgba(0,0,0,0.35);
+      transition: color 0.25s, transform 0.25s;
+      z-index: 510;
+    }
+
+    .overlay-close:hover {
+      color: var(--ink);
+      transform: rotate(90deg);
+    }
+
+    .overlay-close svg { width: 22px; height: 22px; }
+
+    /* ─── SCROLL ANIMATIONS ─────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.75s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.75s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.35s; }
+    .reveal-delay-4 { transition-delay: 0.5s; }
+
+  </style>
+</head>
+<body>
+
+  <!-- ─── NAV ────────────────────────────────────────────────────── -->
+  <nav id="nav">
+    <a href="#" class="nav-name">Tareen Monograph</a>
+    <ul class="nav-links">
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ─── HERO ────────────────────────────────────────────────────── -->
+  <section id="hero">
+    <img
+      class="hero-img"
+      src="https://unsplash.com/photos/2HCVNKMZtVk/download?w=2000&q=90"
+      alt="Woman with white hair on a skateboard"
+    />
+    <div class="hero-overlay"></div>
+    <a class="scroll-cue" href="#portfolio" aria-label="Scroll to portfolio">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="10" y1="3" x2="10" y2="15"/>
+        <polyline points="5 11 10 16 15 11"/>
+      </svg>
+      <span>Scroll</span>
+    </a>
+  </section>
+
+  <!-- ─── PORTFOLIO / BOOKS ────────────────────────────────────────── -->
+  <section id="portfolio">
+
+    <!-- Book 1 -->
+    <div class="book-row">
+      <div class="book-cover-panel" onclick="openBook('photobook.html')" role="button" tabindex="0" aria-label="Open Tidal book">
+        <div class="book-cover-inner">
+          <img
+            src="https://unsplash.com/photos/9DnWtQ6ltcU/download?w=1200&q=85"
+            alt="Tidal – photobook cover"
+          />
+          <div class="book-cover-label"><span>Open Book</span></div>
+        </div>
+      </div>
+      <div class="book-text-panel">
+        <p class="book-eyebrow reveal">2024 &nbsp;·&nbsp; Vol. I</p>
+        <h2 class="book-title reveal reveal-delay-1">Tidal</h2>
+        <p class="book-desc reveal reveal-delay-2">
+          A record of coastlines encountered over four months — the light that changes by the hour, the people who make their living at the water's edge, and the patience required to witness both.
+        </p>
+        <p class="book-meta reveal reveal-delay-3">
+          68 photographs &nbsp;·&nbsp; 12 spreads<br/>
+          Atlantic coast, Iceland &amp; Norway
+        </p>
+        <button class="cta-read reveal reveal-delay-4" onclick="openBook('photobook.html')">Read Book</button>
+      </div>
+    </div>
+
+    <!-- Book 2 -->
+    <div class="book-row">
+      <div class="book-cover-panel" onclick="openBook('photobook.html')" role="button" tabindex="0" aria-label="Open Inland book">
+        <div class="book-cover-inner">
+          <img
+            src="https://unsplash.com/photos/7CSuaiI0nTo/download?w=1200&q=85"
+            alt="Inland – photobook cover"
+          />
+          <div class="book-cover-label"><span>Open Book</span></div>
+        </div>
+      </div>
+      <div class="book-text-panel">
+        <p class="book-eyebrow reveal">2023 &nbsp;·&nbsp; Vol. II</p>
+        <h2 class="book-title reveal reveal-delay-1"><em>Inland</em></h2>
+        <p class="book-desc reveal reveal-delay-2">
+          Moving away from the sea and into the interior — high passes, small towns, and the long silences between one place and the next. A meditation on distance and arrival.
+        </p>
+        <p class="book-meta reveal reveal-delay-3">
+          54 photographs &nbsp;·&nbsp; 12 spreads<br/>
+          Alps, Dolomites &amp; Pyrenees
+        </p>
+        <button class="cta-read reveal reveal-delay-4" onclick="openBook('photobook.html')">Read Book</button>
+      </div>
+    </div>
+
+    <!-- Book 3 -->
+    <div class="book-row">
+      <div class="book-cover-panel" onclick="openBook('photobook.html')" role="button" tabindex="0" aria-label="Open Still book">
+        <div class="book-cover-inner">
+          <img
+            src="https://unsplash.com/photos/rFDZVA4Kh4c/download?w=1200&q=85"
+            alt="Still – photobook cover"
+          />
+          <div class="book-cover-label"><span>Open Book</span></div>
+        </div>
+      </div>
+      <div class="book-text-panel">
+        <p class="book-eyebrow reveal">2022 &nbsp;·&nbsp; Vol. III</p>
+        <h2 class="book-title reveal reveal-delay-1">Still</h2>
+        <p class="book-desc reveal reveal-delay-2">
+          The third volume turns inward — portraits made in natural light, interiors in the early morning, objects that carry weight. An argument for slowness.
+        </p>
+        <p class="book-meta reveal reveal-delay-3">
+          42 photographs &nbsp;·&nbsp; 12 spreads<br/>
+          Northern Europe &amp; the British Isles
+        </p>
+        <button class="cta-read reveal reveal-delay-4" onclick="openBook('photobook.html')">Read Book</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ─── CONTACT ──────────────────────────────────────────────────── -->
+  <section id="contact">
+    <p class="contact-eyebrow reveal">Get in touch</p>
+    <h2 class="contact-heading reveal reveal-delay-1">Let's work<br/><em>together.</em></h2>
+    <p class="contact-body reveal reveal-delay-2">
+      Available for commissions, editorial assignments, and book projects. Based in London; working internationally.
+    </p>
+    <a class="contact-email reveal reveal-delay-3" href="/cdn-cgi/l/email-protection#761e131a1a19361c171b1305131a1a13040f5815191b"><span class="__cf_email__" data-cfemail="147c7178787b547e7579716771787871666d3a777b79">[email&#160;protected]</span></a>
+  </section>
+
+  <!-- ─── FOOTER ───────────────────────────────────────────────────── -->
+  <footer>
+    <span class="footer-name">Tareen Monograph</span>
+    <span class="footer-copy">© 2024 All rights reserved</span>
+  </footer>
+
+  <!-- ─── BOOK OVERLAY ─────────────────────────────────────────────── -->
+  <div id="book-overlay" role="dialog" aria-modal="true" aria-label="Photobook viewer">
+    <button class="overlay-close" onclick="closeBook()" aria-label="Close book">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <iframe id="book-frame" src="" title="Photobook"></iframe>
+  </div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    /* ── Nav scroll state ── */
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+
+    /* ── Scroll reveal ── */
+    const revealObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revealObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+    /* ── Keyboard on cover panels ── */
+    document.querySelectorAll('.book-cover-panel').forEach(el => {
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          el.click();
+        }
+      });
+    });
+
+    /* ── Book overlay ── */
+    const overlay = document.getElementById('book-overlay');
+    const frame   = document.getElementById('book-frame');
+
+    function openBook(src) {
+      frame.src = src;
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeBook() {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+      // slight delay before clearing src so fade-out plays cleanly
+      setTimeout(() => { frame.src = ''; }, 450);
+    }
+
+    // Only the close button (and Escape) closes the overlay
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay.classList.contains('open')) closeBook();
+    });
+  </script>
+</body>
+</html>
